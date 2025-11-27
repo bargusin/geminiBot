@@ -33,7 +33,7 @@ public class GeminiHandler {
         for (Part part : Objects.requireNonNull(response.parts())) {
             if (part.text()
                     .isPresent()) {
-                System.out.println(part.text()
+                logger.info(part.text()
                         .get());
             } else if (part.inlineData()
                     .isPresent()) {
