@@ -13,6 +13,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Stream;
 
 public class MessageHandler {
@@ -78,7 +81,7 @@ public class MessageHandler {
             if (callbackData.startsWith("picture_")) {
                 String fileName = callbackData.substring("picture_".length());
                 try {
-                    bot.execute(bot.sendPicture(chatId, Paths.get(storagePath, fileName)
+                    bot.execute(bot.sendPicture(chatId, Paths.get(getStoragePath(chatId), fileName)
                             .toString()));
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
@@ -95,15 +98,18 @@ public class MessageHandler {
                         bot.showGeneratePictureMenu(chatId, messageId);
                     }
                     case "menu_generate_picture" -> {
-                        try {
-                            byte[] bytes = geminiHandler.generatePicture(bot.getPrompts()
-                                    .get(chatId));
-                            Path path = Files.write(Paths.get(storagePath, "generated_image_" + new Date().getTime() + ".png"), bytes);
-                            bot.execute(bot.sendPicture(chatId, path.toString()));
-                        } catch (Exception e) {
-                            logger.error(e.getMessage(), e);
-                        }
-                        bot.showNotification(callbackId, "✅ Картинка сгенерирована");
+                        CompletableFuture.runAsync(() -> {
+                            try {
+                                byte[] bytes = geminiHandler.generatePicture(bot.getPrompts()
+                                        .get(chatId));
+                                Path path = Files.write(Paths.get(getStoragePath(chatId), "generated_image_" + new Date().getTime() + ".png"), bytes);
+                                bot.execute(bot.sendPicture(chatId, path.toString()));
+                            } catch (
+                                    Exception e) {
+                                logger.error(e.getMessage(), e);
+                            }
+                        });
+                        bot.showNotification(callbackId, "✅ Генерация картинки запущена...");
                         bot.getPrompts()
                                 .remove(chatId);
                         bot.showMainMenu(chatId, messageId, hasAccess(userId));
@@ -115,7 +121,7 @@ public class MessageHandler {
                     }
                     case "menu_generated_pictures" -> {
                         List<String> files = new ArrayList<>();
-                        try (Stream<Path> paths = Files.list(Paths.get(storagePath))) {
+                        try (Stream<Path> paths = Files.list(Paths.get(getStoragePath(chatId)))) {
                             paths.forEach(path -> {
                                 if (Files.isRegularFile(path)) {
                                     files.add(path.getFileName()
@@ -134,5 +140,11 @@ public class MessageHandler {
 
     private boolean hasAccess(Long userId) {
         return admins.contains(userId);
+    }
+
+    public String getStoragePath(Long chatId) throws IOException {
+        return Files.createDirectories(Paths.get(storagePath + "/" + chatId)
+                        .getParent())
+                .toString();
     }
 }
