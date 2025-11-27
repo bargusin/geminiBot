@@ -6,8 +6,10 @@ import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
+import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -16,6 +18,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rapidcoder.gemini.bot.component.KeyboardButton;
 import ru.rapidcoder.gemini.bot.handler.MessageHandler;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -126,6 +129,27 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 
+    public void showGeneratedPicturesMenu(Long chatId, Integer messageId, List<String> files) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\uD83D\uDDBC\uFE0F <b>Список сгенерированных картинок</b>\n\n");
+
+        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+
+        for (String fileName : files) {
+            rows.add(List.of(new KeyboardButton(fileName, "picture_" + fileName)));
+        }
+
+        rows.add(List.of(new KeyboardButton("\uD83C\uDFE0 Главное меню", "back_to_main")));
+        keyboard.setKeyboard(rows);
+
+        if (messageId != null) {
+            updateMessage(chatId, messageId, sb.toString(), keyboard);
+        } else {
+            sendMessage(chatId, sb.toString(), keyboard);
+        }
+    }
+
     public void sendMessage(Long chatId, String text, InlineKeyboardMarkup keyboard) {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
@@ -163,6 +187,14 @@ public class Bot extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             logger.error(e.getMessage(), e);
         }
+    }
+
+    public SendDocument sendPicture(Long chatId, String pictureFile) {
+        File file = new File(pictureFile);
+        SendDocument document = new SendDocument();
+        document.setChatId(chatId);
+        document.setDocument(new InputFile(file, file.getName()));
+        return document;
     }
 
     public Map<Long, String> getPrompts() {

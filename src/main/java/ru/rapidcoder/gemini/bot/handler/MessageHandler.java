@@ -2,18 +2,18 @@ package ru.rapidcoder.gemini.bot.handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
-import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.rapidcoder.gemini.bot.Bot;
 
-import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class MessageHandler {
 
@@ -75,47 +75,61 @@ public class MessageHandler {
             logger.debug("User dosn't access to bot by userId={}", userId);
             bot.showNotification(callbackId, "Доступ к боту запрещен");
         } else {
-
-            switch (callbackData) {
-                case "menu_help" -> {
-                    bot.showHelpMenu(chatId, messageId);
+            if (callbackData.startsWith("picture_")) {
+                String fileName = callbackData.substring("picture_".length());
+                try {
+                    bot.execute(bot.sendPicture(chatId, Paths.get(storagePath, fileName)
+                            .toString()));
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
                 }
-                case "back_to_main" -> {
-                    bot.showMainMenu(chatId, messageId, true);
-                }
-                case "menu_generator_picture" -> {
-                    bot.showGeneratePictureMenu(chatId, messageId);
-                }
-                case "menu_generate_picture" -> {
-                    try {
-                        byte[] bytes = geminiHandler.generatePicture(bot.getPrompts()
-                                .get(chatId));
-                        Path path = Files.write(Paths.get(storagePath, "generated_image_" + new Date().getTime() + ".png"), bytes);
-                        bot.execute(sendPicture(chatId, path.toString()));
-                    } catch (Exception e) {
-                        logger.error(e.getMessage(), e);
+            } else {
+                switch (callbackData) {
+                    case "menu_help" -> {
+                        bot.showHelpMenu(chatId, messageId);
                     }
-
-                    bot.showNotification(callbackId, "✅ Картинка сгенерирована");
-                    bot.getPrompts()
-                            .remove(chatId);
-                    bot.showMainMenu(chatId, messageId, hasAccess(userId));
-                }
-                case "menu_generate_picture_clear" -> {
-                    bot.getPrompts()
-                            .remove(chatId);
-                    bot.showMainMenu(chatId, messageId, hasAccess(userId));
+                    case "back_to_main" -> {
+                        bot.showMainMenu(chatId, messageId, true);
+                    }
+                    case "menu_generator_picture" -> {
+                        bot.showGeneratePictureMenu(chatId, messageId);
+                    }
+                    case "menu_generate_picture" -> {
+                        try {
+                            byte[] bytes = geminiHandler.generatePicture(bot.getPrompts()
+                                    .get(chatId));
+                            Path path = Files.write(Paths.get(storagePath, "generated_image_" + new Date().getTime() + ".png"), bytes);
+                            bot.execute(bot.sendPicture(chatId, path.toString()));
+                        } catch (Exception e) {
+                            logger.error(e.getMessage(), e);
+                        }
+                        bot.showNotification(callbackId, "✅ Картинка сгенерирована");
+                        bot.getPrompts()
+                                .remove(chatId);
+                        bot.showMainMenu(chatId, messageId, hasAccess(userId));
+                    }
+                    case "menu_generate_picture_clear" -> {
+                        bot.getPrompts()
+                                .remove(chatId);
+                        bot.showMainMenu(chatId, messageId, hasAccess(userId));
+                    }
+                    case "menu_generated_pictures" -> {
+                        List<String> files = new ArrayList<>();
+                        try (Stream<Path> paths = Files.list(Paths.get(storagePath))) {
+                            paths.forEach(path -> {
+                                if (Files.isRegularFile(path)) {
+                                    files.add(path.getFileName()
+                                            .toString());
+                                }
+                            });
+                        } catch (IOException e) {
+                            logger.error(e.getMessage(), e);
+                        }
+                        bot.showGeneratedPicturesMenu(chatId, messageId, files);
+                    }
                 }
             }
         }
-    }
-
-    public SendDocument sendPicture(Long chatId, String pictureFile) {
-        File file = new File(pictureFile);
-        SendDocument document = new SendDocument();
-        document.setChatId(chatId);
-        document.setDocument(new InputFile(file, file.getName()));
-        return document;
     }
 
     private boolean hasAccess(Long userId) {
