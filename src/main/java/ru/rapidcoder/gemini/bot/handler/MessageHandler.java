@@ -143,8 +143,7 @@ public class MessageHandler {
     }
 
     public String getStoragePath(Long chatId) throws IOException {
-        return Files.createDirectories(Paths.get(storagePath + "/" + chatId)
-                        .getParent())
+        return Files.createDirectories(Paths.get(storagePath + "/" + chatId))
                 .toString();
     }
 }
