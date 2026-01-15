@@ -1,0 +1,30 @@
+package ru.rapidcoder.gemini.bot.command;
+
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import ru.rapidcoder.gemini.bot.Bot;
+import ru.rapidcoder.gemini.bot.component.InterfaceFactory;
+
+import java.util.List;
+
+public class HelpCommand extends AbstractCommand {
+
+    public HelpCommand(Bot bot, String identifier, String description) {
+        super(bot, identifier, description);
+    }
+
+    @Override
+    public void execute(Update update) {
+        String text = """
+                \uD83D\uDCAC <b>Помощь по боту</b>
+                
+                <b>Основные команды:</b>
+                /start - Главное меню
+                /help - Помощь
+                
+                """;
+        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup(List.of(List.of(InterfaceFactory.createButton("\uD83C\uDFE0 Главное меню", "back_to_main"))));
+
+        processMessage(update, text, keyboard);
+    }
+}

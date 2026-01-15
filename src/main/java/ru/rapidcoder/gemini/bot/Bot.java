@@ -1,6 +1,5 @@
 package ru.rapidcoder.gemini.bot;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -13,29 +12,31 @@ import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import ru.rapidcoder.gemini.bot.component.KeyboardButton;
+import ru.rapidcoder.gemini.SettingsBot;
 import ru.rapidcoder.gemini.bot.handler.MessageHandler;
+import ru.rapidcoder.gemini.database.DatabaseManager;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class Bot extends TelegramLongPollingBot {
 
     private static final Logger logger = LoggerFactory.getLogger(Bot.class);
     private final String botName;
-    private final Map<Long, String> prompts = new ConcurrentHashMap<>();
+    private final DatabaseManager databaseManager;
+    private final SettingsBot settings;
     private final MessageHandler messageHandler;
 
-    public Bot(String botName, String tokenId, String geminiApiKey, String storagePath, List<Long> admins) {
-        super(tokenId);
-        this.botName = botName;
+    public Bot(SettingsBot settings) {
+        super(settings.getTokenId());
+        this.botName = settings.getBotName();
+        this.settings = settings;
 
-        messageHandler = new MessageHandler(this, geminiApiKey, storagePath, admins);
+        this.databaseManager = DatabaseManager.getInstance(settings.getDataBaseFile());
+        this.messageHandler = new MessageHandler(this);
     }
 
     @Override
@@ -48,8 +49,7 @@ public class Bot extends TelegramLongPollingBot {
         try {
             if (update.hasMessage()) {
                 Message message = update.getMessage();
-                Long userId = message.getFrom()
-                        .getId();
+                Long userId = message.getFrom().getId();
                 long chatId = message.getChatId();
                 logger.debug("Обработка сообщения chatId={}, userId={}", chatId, userId);
                 if (message.hasText()) {
@@ -71,83 +71,16 @@ public class Bot extends TelegramLongPollingBot {
         messageHandler.handleCallback(update);
     }
 
-    public void showMainMenu(Long chatId, Integer messageId, boolean isAdmin) {
-        String text = "\uD83C\uDFE0 <b>Главное меню</b>";
-
-        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
-
-        if (getPrompts().get(chatId) != null && !StringUtils.isEmpty(getPrompts().get(chatId))) {
-            rows.add(List.of(new KeyboardButton("\uD83C\uDFA8 Генерация картинки", "menu_generator_picture")));
-        }
-
-        rows.add(List.of(new KeyboardButton("\uD83D\uDDBC\uFE0F Список картинок", "menu_generated_pictures"), new KeyboardButton("\uD83D\uDCAC Помощь", "menu_help")));
-        keyboard.setKeyboard(rows);
-
-        if (messageId != null) {
-            updateMessage(chatId, messageId, text, keyboard);
-        } else {
-            sendMessage(chatId, text, keyboard);
-        }
+    public DatabaseManager getDatabaseManager() {
+        return databaseManager;
     }
 
-    public void showHelpMenu(Long chatId, Integer messageId) {
-        String text = """
-                \uD83D\uDCAC <b>Помощь по боту</b>
-                
-                <b>Основные команды:</b>
-                /start - Главное меню
-                /help - Помощь
-                
-                """;
-
-        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup(List.of(List.of(new KeyboardButton("\uD83C\uDFE0 Главное меню", "back_to_main"))));
-        if (messageId != null) {
-            updateMessage(chatId, messageId, text, keyboard);
-        } else {
-            sendMessage(chatId, text, keyboard);
-        }
+    public SettingsBot getSettings() {
+        return settings;
     }
 
-    public void showGeneratePictureMenu(Long chatId, Integer messageId) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\uD83C\uDFA8 <b>Генерация картинки</b>\n\n");
-
-        sb.append(String.format("Prompt: %s%n", getPrompts().get(chatId)));
-
-        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
-
-        rows.add(List.of(new KeyboardButton("✏\uFE0F Сгенерировать!", "menu_generate_picture"), new KeyboardButton("\uD83D\uDDD1\uFE0F Очистить", "menu_generate_picture_clear")));
-        rows.add(List.of(new KeyboardButton("\uD83C\uDFE0 Главное меню", "back_to_main")));
-        keyboard.setKeyboard(rows);
-
-        if (messageId != null) {
-            updateMessage(chatId, messageId, sb.toString(), keyboard);
-        } else {
-            sendMessage(chatId, sb.toString(), keyboard);
-        }
-    }
-
-    public void showGeneratedPicturesMenu(Long chatId, Integer messageId, List<String> files) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\uD83D\uDDBC\uFE0F <b>Список сгенерированных картинок</b>\n\n");
-
-        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
-
-        for (String fileName : files) {
-            rows.add(List.of(new KeyboardButton(fileName, "picture_" + fileName)));
-        }
-
-        rows.add(List.of(new KeyboardButton("\uD83C\uDFE0 Главное меню", "back_to_main")));
-        keyboard.setKeyboard(rows);
-
-        if (messageId != null) {
-            updateMessage(chatId, messageId, sb.toString(), keyboard);
-        } else {
-            sendMessage(chatId, sb.toString(), keyboard);
-        }
+    public boolean hasAccess(Long userId) {
+        return false;
     }
 
     public void sendMessage(Long chatId, String text, InlineKeyboardMarkup keyboard) {
@@ -197,7 +130,7 @@ public class Bot extends TelegramLongPollingBot {
         return document;
     }
 
-    public Map<Long, String> getPrompts() {
-        return prompts;
+    public String getStoragePicturesPath(Long chatId) throws IOException {
+        return Files.createDirectories(Paths.get(getSettings().getStoragePicturesPath() + "/" + chatId)).toString();
     }
 }

@@ -2,149 +2,102 @@ package ru.rapidcoder.gemini.bot.handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.rapidcoder.gemini.bot.Bot;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.stream.Stream;
+import ru.rapidcoder.gemini.bot.command.CommandRegistry;
+import ru.rapidcoder.gemini.bot.command.HelpCommand;
+import ru.rapidcoder.gemini.bot.command.StartCommand;
+import ru.rapidcoder.gemini.bot.command.gemini.GeneratorPictureCommand;
+import ru.rapidcoder.gemini.bot.command.gemini.ShowGeneratedPictureCommand;
+import ru.rapidcoder.gemini.bot.command.gemini.ShowGeneratedPicturesCommand;
+import ru.rapidcoder.gemini.bot.command.settings.ChangeGeminiApiKeyIdCommand;
+import ru.rapidcoder.gemini.bot.command.settings.ChangeQwenApiKeyIdCommand;
+import ru.rapidcoder.gemini.bot.command.settings.ChangeQwenApiKeySecretCommand;
+import ru.rapidcoder.gemini.bot.command.settings.SettingsCommand;
+import ru.rapidcoder.gemini.bot.service.UserStateService;
 
 public class MessageHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(MessageHandler.class);
+
     private final Bot bot;
-    private final GeminiHandler geminiHandler;
-    private final List<Long> admins;
-    private final String storagePath;
 
-    public MessageHandler(Bot bot, String geminiApiKey, String storagePath, List<Long> admins) {
+    private final CommandRegistry commandRegistry;
+
+    private final UserStateService userStateService = UserStateService.getInstance();
+
+    public MessageHandler(Bot bot) {
         this.bot = bot;
-        this.admins = admins;
-        this.storagePath = storagePath;
+        this.commandRegistry = new CommandRegistry(bot);
 
-        geminiHandler = new GeminiHandler(geminiApiKey);
+        commandRegistry.registry(new StartCommand(bot, "/start", "Старт"));
+        commandRegistry.registry(new StartCommand(bot, "back_to_main", "Возврат в основное меню"));
+        commandRegistry.registry(new HelpCommand(bot, "/help", "Помощь"));
+
+        commandRegistry.registry(new SettingsCommand(bot, "/settings", "Настройки"));
+        commandRegistry.registry(new ShowGeneratedPicturesCommand(bot, "change_setting", "Установка новых значений настроек"));
+        commandRegistry.registry(new ChangeGeminiApiKeyIdCommand(bot, "change_setting_gemini_api_key_id", "Установка нового значения для параметра gemini_api_key_id"));
+        commandRegistry.registry(new ChangeQwenApiKeyIdCommand(bot, "change_setting_qwen_api_key_id", "Установка нового значения для параметра qwen_api_key_id"));
+        commandRegistry.registry(new ChangeQwenApiKeySecretCommand(bot, "change_setting_qwen_api_key_secret", "Установка нового значения для параметра qwen_api_key_secret"));
+
+        commandRegistry.registry(new ShowGeneratedPicturesCommand(bot, "menu_generated_pictures", "Отображение списка ранее сгенерированных изображений"));
+        commandRegistry.registry(new GeneratorPictureCommand(bot, "menu_generator_picture", "Генерация изображения"));
+        commandRegistry.registry(new ShowGeneratedPictureCommand(bot, "picture", "Загрузить ранее сгенерированное изображение"));
+
+        //geminiHandler = new GeminiHandler(geminiApiKey);
     }
 
     public void handleCommand(Update update) {
-        Long chatId = update.getMessage()
-                .getChatId();
-        Long userId = update.getMessage()
-                .getFrom()
-                .getId();
-        String messageText = update.getMessage()
-                .getText();
-        if (!hasAccess(userId)) {
-            //TODO
+        String messageText = update.getMessage().getText();
+        Long userId = update.getMessage().getFrom().getId();
+
+        if (bot.hasAccess(userId)) {
+            bot.sendMessage(userId, "Доступ к боту запрещен", null);
         } else {
-            if ("/start".equals(messageText)) {
-                bot.showMainMenu(chatId, null, hasAccess(userId));
-            } else if ("/help".equals(messageText)) {
-                bot.showHelpMenu(chatId, null);
-            } else {
-                Message message = update.getMessage();
-                logger.debug("Catch prompt for generate picture with id={}", message.getMessageId());
-                bot.getPrompts()
-                        .computeIfAbsent(chatId, k -> message.getText());
-                bot.showGeneratePictureMenu(chatId, null);
+            if ("/cancel".equals(messageText)) {
+                userStateService.clearState(userId);
+                return;
+            }
+
+            InputHandler activeHandler = userStateService.getInputHandler(userId);
+            if (activeHandler != null) {
+                boolean finished = activeHandler.handleInput(update);
+                if (finished) {
+                    userStateService.clearState(userId);
+                }
+                return;
+            }
+
+            try {
+                int index = messageText.indexOf(' ');
+                if (index > 0) {
+                    messageText = messageText.substring(0, index);
+                }
+
+                commandRegistry.retrieveCommand(messageText).execute(update);
+            } catch (IllegalStateException e) {
+                logger.error("Ошибка обработки команды", e);
             }
         }
     }
 
     public void handleCallback(Update update) {
-        String callbackData = update.getCallbackQuery()
-                .getData();
-        String callbackId = update.getCallbackQuery()
-                .getId();
-        Long chatId = update.getCallbackQuery()
-                .getMessage()
-                .getChatId();
-        Long userId = update.getCallbackQuery()
-                .getFrom()
-                .getId();
-        Integer messageId = update.getCallbackQuery()
-                .getMessage()
-                .getMessageId();
+        String callbackData = update.getCallbackQuery().getData();
+        Long userId = update.getCallbackQuery().getFrom().getId();
 
-        if (!hasAccess(userId)) {
-            logger.debug("User dosn't access to bot by userId={}", userId);
-            bot.showNotification(callbackId, "Доступ к боту запрещен");
+        if (bot.hasAccess(userId)) {
+            bot.sendMessage(userId, "Доступ к боту запрещен", null);
         } else {
-            if (callbackData.startsWith("picture_")) {
-                String fileName = callbackData.substring("picture_".length());
-                try {
-                    bot.execute(bot.sendPicture(chatId, Paths.get(getStoragePath(chatId), fileName)
-                            .toString()));
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                }
-            } else {
-                switch (callbackData) {
-                    case "menu_help" -> {
-                        bot.showHelpMenu(chatId, messageId);
-                    }
-                    case "back_to_main" -> {
-                        bot.showMainMenu(chatId, messageId, true);
-                    }
-                    case "menu_generator_picture" -> {
-                        bot.showGeneratePictureMenu(chatId, messageId);
-                    }
-                    case "menu_generate_picture" -> {
-                        CompletableFuture.runAsync(() -> {
-                            try {
-                                byte[] bytes = geminiHandler.generatePicture(bot.getPrompts()
-                                        .get(chatId));
-                                Path path = Files.write(Paths.get(getStoragePath(chatId), "generated_image_" + new Date().getTime() + ".png"), bytes);
-                                bot.execute(bot.sendPicture(chatId, path.toString()));
-                            } catch (
-                                    Exception e) {
-                                logger.error(e.getMessage(), e);
-                            }
-                        });
-                        bot.showNotification(callbackId, "✅ Генерация картинки запущена...");
-                        bot.getPrompts()
-                                .remove(chatId);
-                        bot.showMainMenu(chatId, messageId, hasAccess(userId));
-                    }
-                    case "menu_generate_picture_clear" -> {
-                        bot.getPrompts()
-                                .remove(chatId);
-                        bot.showMainMenu(chatId, messageId, hasAccess(userId));
-                    }
-                    case "menu_generated_pictures" -> {
-                        List<String> files = new ArrayList<>();
-                        try (Stream<Path> paths = Files.list(Paths.get(getStoragePath(chatId)))) {
-                            paths.forEach(path -> {
-                                if (Files.isRegularFile(path)) {
-                                    files.add(path.getFileName()
-                                            .toString());
-                                }
-                            });
-                        } catch (IOException e) {
-                            logger.error(e.getMessage(), e);
-                        }
-                        bot.showGeneratedPicturesMenu(chatId, messageId, files);
-                    }
-                }
+            int index = callbackData.indexOf('#');
+            if (index > 0) {
+                callbackData = callbackData.substring(0, index);
+            }
+
+            try {
+                commandRegistry.retrieveCommand(callbackData).execute(update);
+            } catch (IllegalStateException e) {
+                logger.error("Ошибка обработки команды", e);
             }
         }
-    }
-
-    private boolean hasAccess(Long userId) {
-        //return admins.contains(userId);
-        return true;
-    }
-
-    public String getStoragePath(Long chatId) throws IOException {
-        return Files.createDirectories(Paths.get(storagePath + "/" + chatId))
-                .toString();
     }
 }

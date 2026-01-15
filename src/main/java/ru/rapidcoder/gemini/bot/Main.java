@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
+import ru.rapidcoder.gemini.SettingsBot;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,11 +21,19 @@ public class Main {
             String environment = System.getenv("botEnv") != null ? System.getenv("botEnv") : "dev";
             String botName = System.getenv(environment + "BotName");
             String tokenId = System.getenv(environment + "TokenId");
-            String geminiApiKey = System.getenv(environment + "GeminiApiKey");
-            String storagePath = System.getenv(environment + "StoragePath");
-            List<Long> admins = getAdmins(environment);
+            String encryptedKey = System.getenv(environment + "EncryptedKey");
+            String storagePicturesPath = System.getenv(environment + "StoragePicturesPath");
+            String dataBaseFile = System.getenv(environment + "DataBaseFile");
+
+            SettingsBot settings = new SettingsBot();
+            settings.setBotName(botName);
+            settings.setTokenId(tokenId);
+            settings.setEncryptedKey(encryptedKey);
+            settings.setStoragePicturesPath(storagePicturesPath);
+            settings.setDataBaseFile(dataBaseFile);
+
             TelegramBotsApi telegramBotsApi = createTelegramBotsApi();
-            Bot bot = createBot(botName, tokenId, geminiApiKey, storagePath, admins);
+            Bot bot = createBot(settings);
             telegramBotsApi.registerBot(bot);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -35,8 +44,8 @@ public class Main {
         return new TelegramBotsApi(DefaultBotSession.class);
     }
 
-    public static Bot createBot(String botName, String tokenId, String geminiApiKey, String storagePath, List<Long> admins) {
-        return new Bot(botName, tokenId, geminiApiKey, storagePath, admins);
+    public static Bot createBot(SettingsBot settings) {
+        return new Bot(settings);
     }
 
     private static List<Long> getAdmins(String environment) {

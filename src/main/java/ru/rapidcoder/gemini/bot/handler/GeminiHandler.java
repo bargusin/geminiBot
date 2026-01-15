@@ -18,31 +18,20 @@ public class GeminiHandler {
     private final Client client;
 
     public GeminiHandler(String geminiApiKey) {
-        client = Client.builder()
-                .apiKey(geminiApiKey)
-                .build();
+        client = Client.builder().apiKey(geminiApiKey).build();
     }
 
     public byte[] generatePicture(String prompt) {
-        GenerateContentConfig config = GenerateContentConfig.builder()
-                .responseModalities(Collections.singletonList("IMAGE"))
-                .build();
-
+        GenerateContentConfig config = GenerateContentConfig.builder().responseModalities(Collections.singletonList("IMAGE")).build();
         GenerateContentResponse response = client.models.generateContent(GEMINI_MODEL, prompt, config);
 
         for (Part part : Objects.requireNonNull(response.parts())) {
-            if (part.text()
-                    .isPresent()) {
-                logger.info(part.text()
-                        .get());
-            } else if (part.inlineData()
-                    .isPresent()) {
-                Blob blob = part.inlineData()
-                        .get();
-                if (blob.data()
-                        .isPresent()) {
-                    return blob.data()
-                            .get();
+            if (part.text().isPresent()) {
+                logger.info(part.text().get());
+            } else if (part.inlineData().isPresent()) {
+                Blob blob = part.inlineData().get();
+                if (blob.data().isPresent()) {
+                    return blob.data().get();
                 }
             }
         }
