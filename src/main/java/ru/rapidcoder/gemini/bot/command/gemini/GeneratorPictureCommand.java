@@ -1,5 +1,6 @@
 package ru.rapidcoder.gemini.bot.command.gemini;
 
+import org.apache.commons.lang3.StringUtils;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -50,6 +51,9 @@ public class GeneratorPictureCommand extends AbstractCommand {
                 try {
                     Optional<User> user = userRepository.findByChatId(getChatId(update));
                     if (user.isPresent()) {
+                        if (StringUtils.isEmpty(user.get().getGeminiApiKeyId())) {
+                            throw new IllegalArgumentException("Ключ gemini_api_key_id не задан.");
+                        }
                         GeminiHandler geminiHandler = new GeminiHandler(encryptionService.decrypt(user.get().getGeminiApiKeyId()));
                         byte[] bytes = geminiHandler.generatePicture(update.getMessage().getText());
                         Path path = Files.write(Paths.get(bot.getStoragePicturesPath(getChatId(update)), "generated_image_" + new Date().getTime() + ".png"), bytes);
@@ -57,11 +61,11 @@ public class GeneratorPictureCommand extends AbstractCommand {
 
                         processMessage(update, "Изображение успешно сгенерировано", keyboard);
                     } else {
-                        throw new IllegalArgumentException("Не удалось найти пользователя в базе данных");
+                        throw new IllegalArgumentException("Не удалось найти пользователя в базе данных.");
                     }
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
-                    processMessage(update, "\uD83D\uDEAB Не удалось сгенерировать изображение", keyboard);
+                    processMessage(update, "\uD83D\uDEAB Не удалось сгенерировать изображение. " + e.getMessage(), keyboard);
                 }
                 return true;
             }
