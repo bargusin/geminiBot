@@ -94,13 +94,17 @@ dependencies {
 
     implementation("com.google.genai:google-genai:1.0.0")
 
+    implementation ("org.xerial:sqlite-jdbc:3.51.1.0")
+    implementation ("org.flywaydb:flyway-core:11.18.0")
+    implementation ("com.zaxxer:HikariCP:7.0.2")
+    implementation ("org.hibernate.orm:hibernate-core:7.1.11.Final")
+    implementation ("org.hibernate.orm:hibernate-community-dialects:7.1.11.Final")
+
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.3")
-    testImplementation("org.mockito:mockito-core:5.8.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.8.0")
-    testImplementation("org.assertj:assertj-core:3.24.2")
-    testImplementation("org.awaitility:awaitility:4.2.0")
-    testImplementation("uk.org.webcompere:system-stubs-jupiter:2.1.0")
+    testImplementation("org.mockito:mockito-core:5.8.0")
+    testImplementation("org.mockito:mockito-inline:5.2.0")
 }
 
 test {
