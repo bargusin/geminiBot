@@ -43,8 +43,6 @@ public class MessageHandler {
         commandRegistry.registry(new ShowGeneratedPicturesCommand(bot, "menu_generated_pictures", "Отображение списка ранее сгенерированных изображений"));
         commandRegistry.registry(new GeneratorPictureCommand(bot, "menu_generator_picture", "Генерация изображения"));
         commandRegistry.registry(new ShowGeneratedPictureCommand(bot, "picture", "Загрузить ранее сгенерированное изображение"));
-
-        //geminiHandler = new GeminiHandler(geminiApiKey);
     }
 
     public void handleCommand(Update update) {
@@ -73,7 +71,6 @@ public class MessageHandler {
                 if (index > 0) {
                     messageText = messageText.substring(0, index);
                 }
-
                 commandRegistry.retrieveCommand(messageText).execute(update);
             } catch (IllegalStateException e) {
                 logger.error("Ошибка обработки команды", e);
