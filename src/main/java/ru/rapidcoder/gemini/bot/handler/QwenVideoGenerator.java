@@ -14,7 +14,6 @@ import java.util.Map;
 public class QwenVideoGenerator {
 
     public static void main(String[] args) {
-        // Установите ваш API ключ
         Constants.apiKey = "";
         Constants.baseHttpApiUrl = "https://dashscope-intl.aliyuncs.com/api/v1";
 

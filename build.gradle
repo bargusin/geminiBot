@@ -94,7 +94,6 @@ dependencies {
 
     implementation("com.google.genai:google-genai:1.0.0")
     implementation("com.alibaba:dashscope-sdk-java:2.22.6")
-    implementation("org.bytedeco:javacv:1.5.12")
 
     implementation ("org.xerial:sqlite-jdbc:3.51.1.0")
     implementation ("org.flywaydb:flyway-core:11.18.0")

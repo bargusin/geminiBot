@@ -13,7 +13,6 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import ru.rapidcoder.gemini.SettingsBot;
 import ru.rapidcoder.gemini.bot.handler.MessageHandler;
 import ru.rapidcoder.gemini.database.DatabaseManager;
 
@@ -51,8 +50,10 @@ public class Bot extends TelegramLongPollingBot {
                 Message message = update.getMessage();
                 Long userId = message.getFrom().getId();
                 long chatId = message.getChatId();
-                logger.debug("Обработка сообщения chatId={}, userId={}", chatId, userId);
+                logger.info("Обработка сообщения chatId={}, userId={}", chatId, userId);
                 if (message.hasText()) {
+                    handleCommand(update);
+                } else if (message.hasPhoto()) {
                     handleCommand(update);
                 }
             } else if (update.hasCallbackQuery()) {
@@ -83,17 +84,18 @@ public class Bot extends TelegramLongPollingBot {
         return false;
     }
 
-    public void sendMessage(Long chatId, String text, InlineKeyboardMarkup keyboard) {
+    public Message sendMessage(Long chatId, String text, InlineKeyboardMarkup keyboard) {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
         message.setText(text);
         message.setParseMode(ParseMode.HTML);
         message.setReplyMarkup(keyboard);
         try {
-            execute(message);
+            return execute(message);
         } catch (TelegramApiException e) {
             logger.error(e.getMessage(), e);
         }
+        return null;
     }
 
     public void updateMessage(Long chatId, Integer messageId, String text, InlineKeyboardMarkup keyboard) {
@@ -122,8 +124,8 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 
-    public SendDocument sendPicture(Long chatId, String pictureFile) {
-        File file = new File(pictureFile);
+    public SendDocument sendDocument(Long chatId, String fileName) {
+        File file = new File(fileName);
         SendDocument document = new SendDocument();
         document.setChatId(chatId);
         document.setDocument(new InputFile(file, file.getName()));
@@ -131,6 +133,14 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     public String getStoragePicturesPath(Long chatId) throws IOException {
-        return Files.createDirectories(Paths.get(getSettings().getStoragePicturesPath() + "/" + chatId)).toString();
+        return Files.createDirectories(Paths.get(getSettings().getStoragePath() + "/pictures/" + chatId)).toString();
+    }
+
+    public String getStorageVideosPath(Long chatId) throws IOException {
+        return Files.createDirectories(Paths.get(getSettings().getStoragePath() + "/videos/" + chatId)).toString();
+    }
+
+    public String getStorageUploadPath(Long chatId) throws IOException {
+        return Files.createDirectories(Paths.get(getSettings().getStoragePath() + "/videos/" + chatId + "/upload")).toString();
     }
 }

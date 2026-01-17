@@ -24,17 +24,23 @@ public class ShowGeneratedPicturesCommand extends AbstractCommand {
 
     @Override
     public void execute(Update update) {
-        String text = InterfaceFactory.format("\uD83D\uDDBC\uFE0F <b>Список сгенерированных картинок</b>");
-
-        List<String> files = new ArrayList<>();
+        String text = InterfaceFactory.format("\uD83D\uDDBC\uFE0F <b>Список сгенерированных изображений</b>");
+        List<String> files;
         try (Stream<Path> paths = Files.list(Paths.get(bot.getStoragePicturesPath(getChatId(update))))) {
-            paths.forEach(path -> {
-                if (Files.isRegularFile(path)) {
-                    files.add(path.getFileName().toString());
-                }
-            });
+            files = paths
+                    .filter(Files::isRegularFile)
+                    .sorted((p1, p2) -> {
+                        try {
+                            return Files.getLastModifiedTime(p2).compareTo(Files.getLastModifiedTime(p1));
+                        } catch (IOException e) {
+                            return 0;
+                        }
+                    })
+                    .limit(20)
+                    .map(path -> path.getFileName().toString())
+                    .toList();
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            logger.error("Ошибка при чтении списка файлов: {}", e.getMessage(), e);
             throw new RuntimeException(e);
         }
 

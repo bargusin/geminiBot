@@ -26,9 +26,6 @@ public class User {
     @Column(name = "qwen_api_key_id")
     private String qwenApiKeyId;
 
-    @Column(name = "qwen_api_key_secret")
-    private String qwenApiKeySecret;
-
     public User() {
     }
 
@@ -70,13 +67,5 @@ public class User {
 
     public void setQwenApiKeyId(String qwenApiKeyId) {
         this.qwenApiKeyId = qwenApiKeyId;
-    }
-
-    public String getQwenApiKeySecret() {
-        return qwenApiKeySecret;
-    }
-
-    public void setQwenApiKeySecret(String qwenApiKeySecret) {
-        this.qwenApiKeySecret = qwenApiKeySecret;
     }
 }

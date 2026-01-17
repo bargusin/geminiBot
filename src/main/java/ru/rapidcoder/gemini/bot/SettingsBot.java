@@ -1,4 +1,4 @@
-package ru.rapidcoder.gemini;
+package ru.rapidcoder.gemini.bot;
 
 public class SettingsBot {
 
@@ -10,7 +10,7 @@ public class SettingsBot {
 
     private String dataBaseFile;
 
-    private String storagePicturesPath;
+    private String storagePath;
 
     public String getBotName() {
         return botName;
@@ -44,11 +44,11 @@ public class SettingsBot {
         this.dataBaseFile = dataBaseFile;
     }
 
-    public String getStoragePicturesPath() {
-        return storagePicturesPath;
+    public String getStoragePath() {
+        return storagePath;
     }
 
-    public void setStoragePicturesPath(String storagePicturesPath) {
-        this.storagePicturesPath = storagePicturesPath;
+    public void setStoragePath(String storagePath) {
+        this.storagePath = storagePath;
     }
 }

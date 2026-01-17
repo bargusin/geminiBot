@@ -76,22 +76,6 @@ public class UserRepository {
         });
     }
 
-    public void updateQwenApiKeySecret(Long chatId, String value) {
-        databaseManager.executeInTransaction(session -> {
-            Optional<User> user = getUser(session, chatId);
-            if (user.isPresent()) {
-                user.get().setQwenApiKeySecret(value);
-                logger.info("Задано новое значение qwen_api_key_secret {} для пользователя {}", value, chatId);
-                session.merge(user.get());
-                session.flush();
-            } else {
-                logger.warn("Попытка обновить qwen_api_key_secret для несуществующего пользователя: {}", chatId);
-                throw new RuntimeException("Попытка обновить qwen_api_key_secret для несуществующего пользователя: " + chatId);
-            }
-            return null;
-        });
-    }
-
     public boolean existsByChatId(Long chatId) {
         try {
             return databaseManager.executeInTransaction(session -> getUser(session, chatId).isPresent());

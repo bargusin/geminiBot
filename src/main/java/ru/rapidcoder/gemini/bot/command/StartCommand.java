@@ -38,7 +38,9 @@ public class StartCommand extends AbstractCommand {
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
         rows.add(List.of(new KeyboardButton("\uD83C\uDFA8 Генерация изображения", "menu_generator_picture")));
-        rows.add(List.of(new KeyboardButton("\uD83D\uDDBC\uFE0F Список картинок", "menu_generated_pictures")));
+        rows.add(List.of(new KeyboardButton("\uD83C\uDFA5 Генерация видео", "menu_generator_video")));
+        rows.add(List.of(new KeyboardButton("\uD83D\uDDBC\uFE0F Сгенерированные изображения", "menu_generated_pictures")));
+        rows.add(List.of(new KeyboardButton("\uD83C\uDFAC Сгенерированные видео", "menu_generated_videos")));
         rows.add(List.of(InterfaceFactory.createButton("⚙\uFE0F Настройки", "/settings"), InterfaceFactory.createButton("\uD83D\uDCAC Помощь", "/help")));
         keyboard.setKeyboard(rows);
 

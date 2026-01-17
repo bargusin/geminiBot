@@ -26,7 +26,6 @@ public class SettingsCommand extends AbstractCommand {
 
         rows.add(List.of(createChangeValueButton("gemini_api_key_id")));
         rows.add(List.of(createChangeValueButton("qwen_api_key_id")));
-        rows.add(List.of(createChangeValueButton("qwen_api_key_secret")));
         rows.add(List.of(InterfaceFactory.createButton("\uD83C\uDFE0 Главное меню", "back_to_main")));
         keyboard.setKeyboard(rows);
 

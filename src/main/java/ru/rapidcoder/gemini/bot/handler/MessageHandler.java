@@ -10,9 +10,11 @@ import ru.rapidcoder.gemini.bot.command.StartCommand;
 import ru.rapidcoder.gemini.bot.command.gemini.GeneratorPictureCommand;
 import ru.rapidcoder.gemini.bot.command.gemini.ShowGeneratedPictureCommand;
 import ru.rapidcoder.gemini.bot.command.gemini.ShowGeneratedPicturesCommand;
+import ru.rapidcoder.gemini.bot.command.qwen.GeneratorVideoCommand;
+import ru.rapidcoder.gemini.bot.command.qwen.ShowGeneratedVideoCommand;
+import ru.rapidcoder.gemini.bot.command.qwen.ShowGeneratedVideosCommand;
 import ru.rapidcoder.gemini.bot.command.settings.ChangeGeminiApiKeyIdCommand;
 import ru.rapidcoder.gemini.bot.command.settings.ChangeQwenApiKeyIdCommand;
-import ru.rapidcoder.gemini.bot.command.settings.ChangeQwenApiKeySecretCommand;
 import ru.rapidcoder.gemini.bot.command.settings.SettingsCommand;
 import ru.rapidcoder.gemini.bot.service.UserStateService;
 
@@ -38,11 +40,14 @@ public class MessageHandler {
         commandRegistry.registry(new ShowGeneratedPicturesCommand(bot, "change_setting", "Установка новых значений настроек"));
         commandRegistry.registry(new ChangeGeminiApiKeyIdCommand(bot, "change_setting_gemini_api_key_id", "Установка нового значения для параметра gemini_api_key_id"));
         commandRegistry.registry(new ChangeQwenApiKeyIdCommand(bot, "change_setting_qwen_api_key_id", "Установка нового значения для параметра qwen_api_key_id"));
-        commandRegistry.registry(new ChangeQwenApiKeySecretCommand(bot, "change_setting_qwen_api_key_secret", "Установка нового значения для параметра qwen_api_key_secret"));
 
         commandRegistry.registry(new ShowGeneratedPicturesCommand(bot, "menu_generated_pictures", "Отображение списка ранее сгенерированных изображений"));
         commandRegistry.registry(new GeneratorPictureCommand(bot, "menu_generator_picture", "Генерация изображения"));
         commandRegistry.registry(new ShowGeneratedPictureCommand(bot, "picture", "Загрузить ранее сгенерированное изображение"));
+
+        commandRegistry.registry(new ShowGeneratedVideosCommand(bot, "menu_generated_videos", "Отображение списка ранее сгенерированных видео"));
+        commandRegistry.registry(new GeneratorVideoCommand(bot, "menu_generator_video", "Генерация видео"));
+        commandRegistry.registry(new ShowGeneratedVideoCommand(bot, "video", "Загрузить ранее сгенерированное видео"));
     }
 
     public void handleCommand(Update update) {

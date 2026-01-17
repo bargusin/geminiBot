@@ -8,8 +8,7 @@ CREATE TABLE IF NOT EXISTS user_settings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     chat_id BIGINT NOT NULL,
     gemini_api_key_id TEXT,
-    qwen_api_key_id TEXT,
-    qwen_api_key_secret TEXT
+    qwen_api_key_id TEXT
 
     FOREIGN KEY (chat_id) REFERENCES users(chat_id) ON DELETE CASCADE,
 

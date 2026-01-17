@@ -52,7 +52,6 @@ public class UserRepositoryTest {
         newUser.setUserName("User");
         newUser.setGeminiApiKeyId("gemini_api_key_id");
         newUser.setQwenApiKeyId("qwen_api_key_id");
-        newUser.setQwenApiKeySecret("qwen_api_key_secret");
 
         User savedUser = userRepository.save(newUser);
         assertNotNull(savedUser);
@@ -68,7 +67,6 @@ public class UserRepositoryTest {
         assertEquals(savedUser.getCreatedAt(), foundUser.getCreatedAt());
         assertEquals(savedUser.getGeminiApiKeyId(), foundUser.getGeminiApiKeyId());
         assertEquals(savedUser.getQwenApiKeyId(), foundUser.getQwenApiKeyId());
-        assertEquals(savedUser.getQwenApiKeySecret(), foundUser.getQwenApiKeySecret());
     }
 
     @Test
@@ -105,24 +103,6 @@ public class UserRepositoryTest {
         assertTrue(refreshedOpt.isPresent());
         User refreshedUser = refreshedOpt.get();
         assertEquals("new_qwen_api_key_id", encryptionService.decrypt(refreshedUser.getQwenApiKeyId()));
-    }
-
-    @Test
-    @DisplayName("Интеграционный тест: Обновление параметра qwen_api_key_secret")
-    void testUpdateQwenApiKeyQwenApiKeySecret() {
-        User newUser = new User();
-        newUser.setChatId(100L);
-        newUser.setUserName("User");
-
-        User savedUser = userRepository.save(newUser);
-        assertNotNull(savedUser);
-        assertNotNull(savedUser.getChatId());
-
-        userRepository.updateQwenApiKeySecret(100L, encryptionService.encrypt("new_qwen_api_key_secret"));
-        Optional<User> refreshedOpt = userRepository.findByChatId(100L);
-        assertTrue(refreshedOpt.isPresent());
-        User refreshedUser = refreshedOpt.get();
-        assertEquals("new_qwen_api_key_secret", encryptionService.decrypt(refreshedUser.getQwenApiKeySecret()));
     }
 
     @Test

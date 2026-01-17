@@ -16,7 +16,7 @@ public class ShowGeneratedPictureCommand extends AbstractCommand {
     public void execute(Update update) {
         String fileName = getSuffix(update.getCallbackQuery().getData());
         try {
-            bot.execute(bot.sendPicture(getChatId(update), Paths.get(bot.getStoragePicturesPath(getChatId(update)), fileName).toString()));
+            bot.execute(bot.sendDocument(getChatId(update), Paths.get(bot.getStoragePicturesPath(getChatId(update)), fileName).toString()));
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }

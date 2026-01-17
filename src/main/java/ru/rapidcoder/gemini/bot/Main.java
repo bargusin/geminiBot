@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
-import ru.rapidcoder.gemini.SettingsBot;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,14 +21,14 @@ public class Main {
             String botName = System.getenv(environment + "BotName");
             String tokenId = System.getenv(environment + "TokenId");
             String encryptedKey = System.getenv(environment + "EncryptedKey");
-            String storagePicturesPath = System.getenv(environment + "StoragePicturesPath");
+            String storagePath = System.getenv(environment + "StoragePath");
             String dataBaseFile = System.getenv(environment + "DataBaseFile");
 
             SettingsBot settings = new SettingsBot();
             settings.setBotName(botName);
             settings.setTokenId(tokenId);
             settings.setEncryptedKey(encryptedKey);
-            settings.setStoragePicturesPath(storagePicturesPath);
+            settings.setStoragePath(storagePath);
             settings.setDataBaseFile(dataBaseFile);
 
             TelegramBotsApi telegramBotsApi = createTelegramBotsApi();
