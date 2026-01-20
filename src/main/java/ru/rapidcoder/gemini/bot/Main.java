@@ -6,11 +6,6 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 public class Main {
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
@@ -45,21 +40,5 @@ public class Main {
 
     public static Bot createBot(SettingsBot settings) {
         return new Bot(settings);
-    }
-
-    private static List<Long> getAdmins(String environment) {
-        return Optional.ofNullable(System.getenv(environment + "Admins"))
-                .map(value -> {
-                    if (value.trim()
-                            .isEmpty()) {
-                        throw new IllegalArgumentException("Admins list cannot be empty");
-                    }
-                    return Arrays.stream(value.split(","))
-                            .map(String::trim)
-                            .filter(s -> !s.isEmpty())
-                            .map(Long::parseLong)
-                            .collect(Collectors.toList());
-                })
-                .orElseThrow(() -> new IllegalArgumentException("Role's model not defined in environment"));
     }
 }

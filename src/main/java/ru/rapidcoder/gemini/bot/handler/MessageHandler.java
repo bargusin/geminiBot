@@ -37,7 +37,6 @@ public class MessageHandler {
         commandRegistry.registry(new HelpCommand(bot, "/help", "Помощь"));
 
         commandRegistry.registry(new SettingsCommand(bot, "/settings", "Настройки"));
-        commandRegistry.registry(new ShowGeneratedPicturesCommand(bot, "change_setting", "Установка новых значений настроек"));
         commandRegistry.registry(new ChangeGeminiApiKeyIdCommand(bot, "change_setting_gemini_api_key_id", "Установка нового значения для параметра gemini_api_key_id"));
         commandRegistry.registry(new ChangeQwenApiKeyIdCommand(bot, "change_setting_qwen_api_key_id", "Установка нового значения для параметра qwen_api_key_id"));
 

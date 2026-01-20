@@ -3,7 +3,6 @@ package ru.rapidcoder.gemini.bot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -107,18 +106,6 @@ public class Bot extends TelegramLongPollingBot {
         message.setReplyMarkup(keyboard);
         try {
             execute(message);
-        } catch (TelegramApiException e) {
-            logger.error(e.getMessage(), e);
-        }
-    }
-
-    public void showNotification(String callbackQueryId, String text) {
-        AnswerCallbackQuery answer = new AnswerCallbackQuery();
-        answer.setCallbackQueryId(callbackQueryId);
-        answer.setText(text);
-        answer.setShowAlert(false);
-        try {
-            execute(answer);
         } catch (TelegramApiException e) {
             logger.error(e.getMessage(), e);
         }
