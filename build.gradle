@@ -106,6 +106,9 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:5.8.0")
     testImplementation("org.mockito:mockito-core:5.8.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
+
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 test {
@@ -123,7 +126,7 @@ test {
 }
 
 jacoco {
-    toolVersion = "0.8.10"
+    toolVersion = "0.8.14"
 }
 
 jacocoTestCoverageVerification {
