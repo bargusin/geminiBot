@@ -7,9 +7,11 @@ import ru.rapidcoder.gemini.bot.Bot;
 import ru.rapidcoder.gemini.bot.command.CommandRegistry;
 import ru.rapidcoder.gemini.bot.command.HelpCommand;
 import ru.rapidcoder.gemini.bot.command.StartCommand;
+import ru.rapidcoder.gemini.bot.command.gemini.DownloadAllPicturesCommand;
 import ru.rapidcoder.gemini.bot.command.gemini.GeneratorPictureCommand;
 import ru.rapidcoder.gemini.bot.command.gemini.ShowGeneratedPictureCommand;
 import ru.rapidcoder.gemini.bot.command.gemini.ShowGeneratedPicturesCommand;
+import ru.rapidcoder.gemini.bot.command.qwen.DownloadAllVideosCommand;
 import ru.rapidcoder.gemini.bot.command.qwen.GeneratorVideoCommand;
 import ru.rapidcoder.gemini.bot.command.qwen.ShowGeneratedVideoCommand;
 import ru.rapidcoder.gemini.bot.command.qwen.ShowGeneratedVideosCommand;
@@ -43,10 +45,12 @@ public class MessageHandler {
         commandRegistry.registry(new ShowGeneratedPicturesCommand(bot, "menu_generated_pictures", "Отображение списка ранее сгенерированных изображений"));
         commandRegistry.registry(new GeneratorPictureCommand(bot, "menu_generator_picture", "Генерация изображения"));
         commandRegistry.registry(new ShowGeneratedPictureCommand(bot, "picture", "Загрузить ранее сгенерированное изображение"));
+        commandRegistry.registry(new DownloadAllPicturesCommand(bot, "download_all_pictures", "Выгрузка всех сохранённых изображений в архив"));
 
         commandRegistry.registry(new ShowGeneratedVideosCommand(bot, "menu_generated_videos", "Отображение списка ранее сгенерированных видео"));
         commandRegistry.registry(new GeneratorVideoCommand(bot, "menu_generator_video", "Генерация видео"));
         commandRegistry.registry(new ShowGeneratedVideoCommand(bot, "video", "Загрузить ранее сгенерированное видео"));
+        commandRegistry.registry(new DownloadAllVideosCommand(bot, "download_all_videos", "Выгрузка всех сохранённых видео в архив"));
     }
 
     public void handleCommand(Update update) {

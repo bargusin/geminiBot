@@ -50,6 +50,7 @@ public class ShowGeneratedVideosCommand extends AbstractCommand {
         for (String fileName : files) {
             rows.add(List.of(new KeyboardButton(fileName, "video#" + fileName)));
         }
+        rows.add(List.of(new KeyboardButton("\uD83D\uDCE6 Скачать все видео", "download_all_videos")));
         rows.add(List.of(new KeyboardButton("\uD83C\uDFE0 Главное меню", "back_to_main")));
         keyboard.setKeyboard(rows);
 

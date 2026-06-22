@@ -49,6 +49,7 @@ public class ShowGeneratedPicturesCommand extends AbstractCommand {
         for (String fileName : files) {
             rows.add(List.of(new KeyboardButton(fileName, "picture#" + fileName)));
         }
+        rows.add(List.of(new KeyboardButton("\uD83D\uDCE6 Скачать все изображения", "download_all_pictures")));
         rows.add(List.of(new KeyboardButton("\uD83C\uDFE0 Главное меню", "back_to_main")));
         keyboard.setKeyboard(rows);
 
