@@ -95,6 +95,7 @@ public class MessageHandler {
             }
 
             try {
+                userStateService.clearState(userId);
                 commandRegistry.retrieveCommand(callbackData).execute(update);
             } catch (IllegalStateException e) {
                 logger.error("Ошибка обработки команды", e);

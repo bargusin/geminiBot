@@ -35,7 +35,11 @@ public class GeneratorPictureCommand extends AbstractCommand {
     public void execute(Update update) {
         Long chatId = getChatId(update);
 
-        processMessage(update, "Введите описание для генерации изображения:", null);
+        InlineKeyboardMarkup cancelKeyboard = new InlineKeyboardMarkup();
+        cancelKeyboard.setKeyboard(List.of(
+                List.of(InterfaceFactory.createButton("❌ Отмена", "back_to_main"))
+        ));
+        processMessage(update, "Введите описание для генерации изображения:", cancelKeyboard);
 
         userStateService.setInputHandler(chatId, new InputHandler() {
             @Override

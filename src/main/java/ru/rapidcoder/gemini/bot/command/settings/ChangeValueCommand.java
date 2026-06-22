@@ -29,7 +29,11 @@ public abstract class ChangeValueCommand extends AbstractCommand {
     protected void changeValue(String valueName, Update update) {
         Long chatId = getChatId(update);
 
-        processMessage(update, String.format("Введите новое значение для %s:", valueName), null);
+        InlineKeyboardMarkup cancelKeyboard = new InlineKeyboardMarkup();
+        cancelKeyboard.setKeyboard(List.of(
+                List.of(InterfaceFactory.createButton("❌ Отмена", "/settings"))
+        ));
+        processMessage(update, String.format("Введите новое значение для %s:", valueName), cancelKeyboard);
 
         userStateService.setInputHandler(chatId, new InputHandler() {
             @Override

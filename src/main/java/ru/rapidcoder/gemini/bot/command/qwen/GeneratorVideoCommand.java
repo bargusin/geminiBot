@@ -59,7 +59,11 @@ public class GeneratorVideoCommand extends AbstractCommand {
     public void execute(Update update) {
         Long chatId = getChatId(update);
 
-        processMessage(update, "Введите описание для генерации видео:", null);
+        InlineKeyboardMarkup cancelKeyboard = new InlineKeyboardMarkup();
+        cancelKeyboard.setKeyboard(List.of(
+                List.of(InterfaceFactory.createButton("❌ Отмена", "back_to_main"))
+        ));
+        processMessage(update, "Введите описание для генерации видео:", cancelKeyboard);
 
         userStateService.setInputHandler(chatId, new InputHandler() {
             @Override
