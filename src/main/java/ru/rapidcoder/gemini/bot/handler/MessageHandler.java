@@ -61,7 +61,7 @@ public class MessageHandler {
         if (bot.hasAccess(userId)) {
             bot.sendMessage(userId, "Доступ к боту запрещен", null);
         } else {
-            if ("/cancel".equals(messageText)) {
+            if (CommandId.CANCEL.equals(messageText)) {
                 userStateService.clearState(userId);
                 return;
             }

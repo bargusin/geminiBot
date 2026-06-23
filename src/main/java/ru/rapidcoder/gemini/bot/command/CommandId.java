@@ -5,6 +5,7 @@ public final class CommandId {
     private CommandId() {}
 
     public static final String START = "/start";
+    public static final String CANCEL = "/cancel";
     public static final String BACK_TO_MAIN = "back_to_main";
     public static final String HELP = "/help";
     public static final String SETTINGS = "/settings";
