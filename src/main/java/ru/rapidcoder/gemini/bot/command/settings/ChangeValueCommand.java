@@ -5,6 +5,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import ru.rapidcoder.gemini.bot.Bot;
 import ru.rapidcoder.gemini.bot.command.AbstractCommand;
+import ru.rapidcoder.gemini.bot.command.CommandId;
 import ru.rapidcoder.gemini.bot.component.InterfaceFactory;
 import ru.rapidcoder.gemini.bot.handler.InputHandler;
 import ru.rapidcoder.gemini.database.repository.UserRepository;
@@ -31,7 +32,7 @@ public abstract class ChangeValueCommand extends AbstractCommand {
 
         InlineKeyboardMarkup cancelKeyboard = new InlineKeyboardMarkup();
         cancelKeyboard.setKeyboard(List.of(
-                List.of(InterfaceFactory.createButton("❌ Отмена", "/settings"))
+                List.of(InterfaceFactory.createButton("❌ Отмена", CommandId.SETTINGS))
         ));
         processMessage(update, String.format("Введите новое значение для %s:", valueName), cancelKeyboard);
 
@@ -41,13 +42,13 @@ public abstract class ChangeValueCommand extends AbstractCommand {
                 InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
                 List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
-                rows.add(List.of(InterfaceFactory.createButton("⚙\uFE0F Настройки", "/settings")));
+                rows.add(List.of(InterfaceFactory.createButton("⚙️ Настройки", CommandId.SETTINGS)));
                 keyboard.setKeyboard(rows);
                 try {
                     updateValue(update);
                     processMessage(update, String.format("✅ Новое значение для %s успешно установлено", valueName), keyboard);
                 } catch (RuntimeException e) {
-                    processMessage(update, String.format("\uD83D\uDEAB Не удалось установить значение для %s", valueName), keyboard);
+                    processMessage(update, String.format("🚫 Не удалось установить значение для %s", valueName), keyboard);
                 }
                 return true;
             }

@@ -6,7 +6,7 @@ import ru.rapidcoder.gemini.bot.Bot;
 public class UnknownCommand extends AbstractCommand {
 
     public UnknownCommand(Bot bot) {
-        this(bot, "unknownCommand", "Unknown command");
+        this(bot, CommandId.UNKNOWN, "Unknown command");
     }
 
     private UnknownCommand(Bot bot, String identifier, String description) {

@@ -5,6 +5,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import ru.rapidcoder.gemini.bot.Bot;
 import ru.rapidcoder.gemini.bot.command.AbstractCommand;
+import ru.rapidcoder.gemini.bot.command.CommandId;
 import ru.rapidcoder.gemini.bot.component.InterfaceFactory;
 import ru.rapidcoder.gemini.bot.component.KeyboardButton;
 
@@ -24,7 +25,7 @@ public class ShowGeneratedPicturesCommand extends AbstractCommand {
 
     @Override
     public void execute(Update update) {
-        String text = InterfaceFactory.format("\uD83D\uDDBC\uFE0F <b>Список сгенерированных изображений</b>");
+        String text = InterfaceFactory.format("🖼️ <b>Список сгенерированных изображений</b>");
         List<String> files;
         try (Stream<Path> paths = Files.list(Paths.get(bot.getStoragePicturesPath(getChatId(update))))) {
             files = paths
@@ -47,10 +48,10 @@ public class ShowGeneratedPicturesCommand extends AbstractCommand {
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
         for (String fileName : files) {
-            rows.add(List.of(new KeyboardButton(fileName, "picture#" + fileName)));
+            rows.add(List.of(new KeyboardButton(fileName, CommandId.SHOW_PICTURE + "#" + fileName)));
         }
-        rows.add(List.of(new KeyboardButton("\uD83D\uDCE6 Скачать все изображения", "download_all_pictures")));
-        rows.add(List.of(new KeyboardButton("\uD83C\uDFE0 Главное меню", "back_to_main")));
+        rows.add(List.of(new KeyboardButton("📦 Скачать все изображения", CommandId.DOWNLOAD_ALL_PICTURES)));
+        rows.add(List.of(new KeyboardButton("🏠 Главное меню", CommandId.BACK_TO_MAIN)));
         keyboard.setKeyboard(rows);
 
         processMessage(update, text, keyboard);

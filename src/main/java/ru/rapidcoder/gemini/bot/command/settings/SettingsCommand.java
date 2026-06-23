@@ -5,6 +5,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import ru.rapidcoder.gemini.bot.Bot;
 import ru.rapidcoder.gemini.bot.command.AbstractCommand;
+import ru.rapidcoder.gemini.bot.command.CommandId;
 import ru.rapidcoder.gemini.bot.component.InterfaceFactory;
 import ru.rapidcoder.gemini.bot.component.KeyboardButton;
 
@@ -19,21 +20,16 @@ public class SettingsCommand extends AbstractCommand {
 
     @Override
     public void execute(Update update) {
-        String text = InterfaceFactory.format("⚙\uFE0F <b>Настройки</b>");
+        String text = InterfaceFactory.format("⚙️ <b>Настройки</b>");
 
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
-        rows.add(List.of(createChangeValueButton("gemini_api_key_id")));
-        rows.add(List.of(createChangeValueButton("qwen_api_key_id")));
-        rows.add(List.of(InterfaceFactory.createButton("\uD83C\uDFE0 Главное меню", "back_to_main")));
+        rows.add(List.of(new KeyboardButton("✏️ gemini_api_key_id", CommandId.CHANGE_GEMINI_API_KEY_ID)));
+        rows.add(List.of(new KeyboardButton("✏️ qwen_api_key_id", CommandId.CHANGE_QWEN_API_KEY_ID)));
+        rows.add(List.of(InterfaceFactory.createButton("🏠 Главное меню", CommandId.BACK_TO_MAIN)));
         keyboard.setKeyboard(rows);
 
         processMessage(update, text, keyboard);
     }
-
-    private KeyboardButton createChangeValueButton(String valueName) {
-        return InterfaceFactory.createButton("✏\uFE0F " + valueName, "change_setting_" + valueName);
-    }
 }
-

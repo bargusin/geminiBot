@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.*;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import ru.rapidcoder.gemini.bot.Bot;
 import ru.rapidcoder.gemini.bot.SettingsBot;
+import ru.rapidcoder.gemini.bot.command.CommandId;
 import ru.rapidcoder.gemini.bot.handler.InputHandler;
 import ru.rapidcoder.gemini.bot.service.UserStateService;
 import ru.rapidcoder.gemini.database.DatabaseManager;
@@ -60,7 +61,7 @@ class ChangeQwenApiKeyIdCommandTest {
         when(bot.getDatabaseManager()).thenReturn(databaseManager);
         when(bot.getSettings()).thenReturn(settings);
 
-        command = new ChangeQwenApiKeyIdCommand(bot, "/change_qwen_api_key", "Изменить Qwen API ключ");
+        command = new ChangeQwenApiKeyIdCommand(bot, CommandId.CHANGE_QWEN_API_KEY_ID, "Изменить Qwen API ключ");
 
         UserStateService.getInstance().clearState(CHAT_ID);
     }
@@ -111,7 +112,7 @@ class ChangeQwenApiKeyIdCommandTest {
     @Test
     @DisplayName("getIdentifier: должен вернуть переданный идентификатор")
     void testGetIdentifier() {
-        assertEquals("/change_qwen_api_key", command.getIdentifier());
+        assertEquals(CommandId.CHANGE_QWEN_API_KEY_ID, command.getIdentifier());
     }
 
     @Test

@@ -16,14 +16,14 @@ public class HelpCommand extends AbstractCommand {
     @Override
     public void execute(Update update) {
         String text = """
-                \uD83D\uDCAC <b>Помощь по боту</b>
-                
+                💬 <b>Помощь по боту</b>
+
                 <b>Основные команды:</b>
                 /start - Главное меню
                 /help - Помощь
-                
+
                 """;
-        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup(List.of(List.of(InterfaceFactory.createButton("\uD83C\uDFE0 Главное меню", "back_to_main"))));
+        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup(List.of(List.of(InterfaceFactory.createButton("🏠 Главное меню", CommandId.BACK_TO_MAIN))));
 
         processMessage(update, text, keyboard);
     }

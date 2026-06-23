@@ -4,6 +4,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import ru.rapidcoder.gemini.bot.Bot;
 import ru.rapidcoder.gemini.bot.command.AbstractCommand;
+import ru.rapidcoder.gemini.bot.command.CommandId;
 import ru.rapidcoder.gemini.bot.component.InterfaceFactory;
 import ru.rapidcoder.gemini.bot.component.KeyboardButton;
 
@@ -29,8 +30,8 @@ public class DownloadAllVideosCommand extends AbstractCommand {
 
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         keyboard.setKeyboard(List.of(
-                List.of(new KeyboardButton("🎬 Сгенерированные видео", "menu_generated_videos")),
-                List.of(InterfaceFactory.createButton("🏠 Главное меню", "back_to_main"))
+                List.of(new KeyboardButton("🎬 Сгенерированные видео", CommandId.MENU_GENERATED_VIDEOS)),
+                List.of(InterfaceFactory.createButton("🏠 Главное меню", CommandId.BACK_TO_MAIN))
         ));
 
         List<Path> files;

@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import ru.rapidcoder.gemini.bot.Bot;
 import ru.rapidcoder.gemini.bot.command.AbstractCommand;
+import ru.rapidcoder.gemini.bot.command.CommandId;
 import ru.rapidcoder.gemini.bot.component.InterfaceFactory;
 import ru.rapidcoder.gemini.bot.handler.GeminiHandler;
 import ru.rapidcoder.gemini.bot.handler.InputHandler;
@@ -37,7 +38,7 @@ public class GeneratorPictureCommand extends AbstractCommand {
 
         InlineKeyboardMarkup cancelKeyboard = new InlineKeyboardMarkup();
         cancelKeyboard.setKeyboard(List.of(
-                List.of(InterfaceFactory.createButton("❌ Отмена", "back_to_main"))
+                List.of(InterfaceFactory.createButton("❌ Отмена", CommandId.BACK_TO_MAIN))
         ));
         processMessage(update, "Введите описание для генерации изображения:", cancelKeyboard);
 
@@ -47,7 +48,7 @@ public class GeneratorPictureCommand extends AbstractCommand {
                 InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
                 List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
-                rows.add(List.of(InterfaceFactory.createButton("\uD83C\uDFE0 Главное меню", "back_to_main")));
+                rows.add(List.of(InterfaceFactory.createButton("🏠 Главное меню", CommandId.BACK_TO_MAIN)));
                 keyboard.setKeyboard(rows);
                 try {
                     Optional<User> user = userRepository.findByChatId(getChatId(update));
@@ -66,7 +67,7 @@ public class GeneratorPictureCommand extends AbstractCommand {
                     }
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
-                    processMessage(update, "\uD83D\uDEAB Не удалось сгенерировать изображение. " + e.getMessage(), keyboard);
+                    processMessage(update, "🚫 Не удалось сгенерировать изображение. " + e.getMessage(), keyboard);
                 }
                 return true;
             }

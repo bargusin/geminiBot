@@ -32,16 +32,16 @@ public class StartCommand extends AbstractCommand {
             userRepository.save(user);
         }
 
-        String text = InterfaceFactory.format("\uD83C\uDFE0 <b>Главное меню</b>");
+        String text = InterfaceFactory.format("🏠 <b>Главное меню</b>");
 
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
-        rows.add(List.of(new KeyboardButton("\uD83C\uDFA8 Генерация изображения", "menu_generator_picture")));
-        rows.add(List.of(new KeyboardButton("\uD83C\uDFA5 Генерация видео", "menu_generator_video")));
-        rows.add(List.of(new KeyboardButton("\uD83D\uDDBC\uFE0F Сгенерированные изображения", "menu_generated_pictures")));
-        rows.add(List.of(new KeyboardButton("\uD83C\uDFAC Сгенерированные видео", "menu_generated_videos")));
-        rows.add(List.of(InterfaceFactory.createButton("⚙\uFE0F Настройки", "/settings"), InterfaceFactory.createButton("\uD83D\uDCAC Помощь", "/help")));
+        rows.add(List.of(new KeyboardButton("🎨 Генерация изображения", CommandId.MENU_GENERATOR_PICTURE)));
+        rows.add(List.of(new KeyboardButton("🎥 Генерация видео", CommandId.MENU_GENERATOR_VIDEO)));
+        rows.add(List.of(new KeyboardButton("🖼️ Сгенерированные изображения", CommandId.MENU_GENERATED_PICTURES)));
+        rows.add(List.of(new KeyboardButton("🎬 Сгенерированные видео", CommandId.MENU_GENERATED_VIDEOS)));
+        rows.add(List.of(InterfaceFactory.createButton("⚙️ Настройки", CommandId.SETTINGS), InterfaceFactory.createButton("💬 Помощь", CommandId.HELP)));
         keyboard.setKeyboard(rows);
 
         processMessage(update, text, keyboard);
