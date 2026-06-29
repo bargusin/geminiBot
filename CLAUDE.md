@@ -1,63 +1,63 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Этот файл содержит инструкции для Claude Code (claude.ai/code) при работе с кодом в этом репозитории.
 
-## Build & Run
+## Сборка и запуск
 
 ```bash
-./gradlew build          # Build and run tests
-./gradlew test           # Run tests only
-./gradlew test --info    # Verbose test output
-./gradlew run            # Run the application
-./gradlew jar            # Create fat JAR in build/libs/
+./gradlew build          # Сборка и запуск тестов
+./gradlew test           # Только тесты
+./gradlew test --info    # Подробный вывод тестов
+./gradlew run            # Запуск приложения
+./gradlew jar            # Создать fat JAR в build/libs/
 ```
 
-Run a single test class:
+Запуск одного тестового класса:
 ```bash
 ./gradlew test --tests "ru.rapidcoder.gemini.database.test.DatabaseManagerTest"
 ```
 
-Coverage report is generated at `build/reports/jacoco/html/index.html`. JaCoCo enforces a 10% minimum coverage threshold — the build fails if coverage drops below this.
+Отчёт о покрытии генерируется в `build/reports/jacoco/html/index.html`. JaCoCo требует минимум 10% покрытия — сборка упадёт, если покрытие ниже этого порога.
 
-## Architecture Overview
+## Архитектура
 
-This is a Telegram bot that generates images (Google Gemini) and videos (Alibaba Qwen) on user request. Written in Java 17 with Gradle.
+Telegram-бот для генерации изображений (Google Gemini) и видео (Alibaba Qwen) по запросу пользователя. Написан на Java 17 с Gradle.
 
-### Message Flow
+### Поток сообщений
 
 ```
 Telegram Update
   → Bot.onUpdateReceived()
   → MessageHandler.handleCommand() / handleCallback()
-      ├─ If user has an active InputHandler (multi-step flow): route there
-      ├─ /cancel clears the active InputHandler
-      └─ Otherwise: CommandRegistry → Command.execute()
+      ├─ Если у пользователя есть активный InputHandler (многошаговый флоу): перенаправить туда
+      ├─ /cancel очищает активный InputHandler
+      └─ Иначе: CommandRegistry → Command.execute()
 ```
 
-**Multi-step input**: `UserStateService` (singleton) stores an `InputHandler` per chat ID. Commands that need follow-up input (e.g., prompts for generation) set an `InputHandler` on the service, which intercepts the next message.
+**Многошаговый ввод**: `UserStateService` (синглтон) хранит `InputHandler` для каждого chat ID. Команды, требующие дополнительного ввода (например, промпты для генерации), устанавливают `InputHandler` в сервис, который перехватывает следующее сообщение.
 
-### Key Packages
+### Ключевые пакеты
 
-| Package | Role |
-|---------|------|
-| `bot/` | `Bot` (Telegram long-polling), `MessageHandler` (routing), `SettingsBot` (config) |
-| `bot/command/` | One class per command; `CommandRegistry` maps text/callbacks to `Command` instances |
-| `bot/handler/` | `GeminiHandler` (image gen), `QwenVideoGenerator` (async video gen with polling) |
-| `bot/service/` | `UserStateService` — in-memory per-user state for multi-step flows |
-| `database/` | `DatabaseManager` singleton (HikariCP + Flyway + Hibernate), `UserRepository` |
-| `service/` | `EncryptionService` — AES-256-GCM for storing user API keys |
+| Пакет | Роль |
+|-------|------|
+| `bot/` | `Bot` (Telegram long-polling), `MessageHandler` (маршрутизация), `SettingsBot` (конфигурация) |
+| `bot/command/` | По одному классу на команду; `CommandRegistry` сопоставляет текст/колбэки с экземплярами `Command` |
+| `bot/handler/` | `GeminiHandler` (генерация изображений), `QwenVideoGenerator` (асинхронная генерация видео с поллингом) |
+| `bot/service/` | `UserStateService` — хранит состояние пользователя в памяти для многошаговых флоу |
+| `database/` | `DatabaseManager` синглтон (HikariCP + Flyway + Hibernate), `UserRepository` |
+| `service/` | `EncryptionService` — AES-256-GCM для хранения API-ключей пользователей |
 
-### Database
+### База данных
 
-SQLite with Hibernate ORM. Schema managed by Flyway (`src/main/resources/migration/`). HikariCP pool size is 1 (SQLite limitation). All DB access goes through `DatabaseManager.executeInTransaction()`.
+SQLite с Hibernate ORM. Схема управляется через Flyway (`src/main/resources/migration/`). Размер пула HikariCP равен 1 (ограничение SQLite). Весь доступ к БД идёт через `DatabaseManager.executeInTransaction()`.
 
-User API keys (Gemini, Qwen) are stored encrypted in the `users` table. Encryption key comes from the `encryptedKey` environment variable.
+API-ключи пользователей (Gemini, Qwen) хранятся в зашифрованном виде в таблице `users`. Ключ шифрования берётся из переменной окружения `encryptedKey`.
 
-Generated files are saved to `{storagePath}/pictures/{chatId}/` and `{storagePath}/videos/{chatId}/`.
+Сгенерированные файлы сохраняются в `{storagePath}/pictures/{chatId}/` и `{storagePath}/videos/{chatId}/`.
 
-### Configuration
+### Конфигурация
 
-The bot reads environment-prefixed variables based on `botEnv` (e.g., `dev` or `prod`):
+Бот читает переменные окружения с префиксом, заданным в `botEnv` (например, `dev` или `prod`):
 
 ```
 botEnv=dev
@@ -71,11 +71,11 @@ devStoragePath=/path/to/storage
 devDataBaseFile=/path/to/db.sqlite
 ```
 
-### External APIs
+### Внешние API
 
-- **Google Gemini** (`gemini-2.5-flash-image` model) — synchronous image generation
-- **Alibaba Qwen** (`wan2.6-t2v` model) — asynchronous video generation with polling loop
-- **Telegram Bot API** — long polling, inline keyboards, callback queries
+- **Google Gemini** (модель `gemini-2.5-flash-image`) — синхронная генерация изображений
+- **Alibaba Qwen** (модель `wan2.6-t2v`) — асинхронная генерация видео с поллингом
+- **Telegram Bot API** — long polling, inline-клавиатуры, callback-запросы
 
 ## 📝 Стандарты Git и Коммитов
 * **Префикс задач:** В проекте используется сквозной префикс `PROJ-` для всех задач.
