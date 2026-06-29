@@ -128,6 +128,8 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     public String getStorageUploadPath(Long chatId) throws IOException {
-        return Files.createDirectories(Paths.get(getSettings().getStoragePath() + "/videos/" + chatId + "/upload")).toString();
+        return Files.createDirectories(
+                Paths.get(getSettings().getStoragePath() + "/videos/" + chatId + "/upload")
+        ).toString();
     }
 }

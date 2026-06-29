@@ -101,7 +101,8 @@ public class EncryptionService {
             return new String(plainText, StandardCharsets.UTF_8);
 
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка при расшифровке данных (возможно, неверный ключ или поврежденные данные)", e);
+            throw new RuntimeException(
+                    "Ошибка при расшифровке данных (возможно, неверный ключ или поврежденные данные)", e);
         }
     }
 }

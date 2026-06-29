@@ -16,6 +16,7 @@ public class ChangeGeminiApiKeyIdCommand extends ChangeValueCommand {
 
     @Override
     void updateValue(Update update) throws RuntimeException {
-        userRepository.updateGeminiApiKeyId(getChatId(update), encryptionService.encrypt(update.getMessage().getText()));
+        userRepository.updateGeminiApiKeyId(
+                getChatId(update), encryptionService.encrypt(update.getMessage().getText()));
     }
 }

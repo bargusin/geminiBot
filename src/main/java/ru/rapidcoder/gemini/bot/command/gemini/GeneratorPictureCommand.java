@@ -17,7 +17,10 @@ import ru.rapidcoder.gemini.service.EncryptionService;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 
 public class GeneratorPictureCommand extends AbstractCommand {
 
@@ -56,9 +59,13 @@ public class GeneratorPictureCommand extends AbstractCommand {
                         if (StringUtils.isEmpty(user.get().getGeminiApiKeyId())) {
                             throw new IllegalArgumentException("Ключ gemini_api_key_id не задан.");
                         }
-                        GeminiHandler geminiHandler = new GeminiHandler(encryptionService.decrypt(user.get().getGeminiApiKeyId()));
+                        GeminiHandler geminiHandler = new GeminiHandler(
+                                encryptionService.decrypt(user.get().getGeminiApiKeyId()));
                         byte[] bytes = geminiHandler.generatePicture(update.getMessage().getText());
-                        Path path = Files.write(Paths.get(bot.getStoragePicturesPath(getChatId(update)), "generated_image_" + new Random().nextDouble() + ".png"), bytes);
+                        String fileName = "generated_image_" + new Random().nextDouble() + ".png";
+                        Path path = Files.write(
+                                Paths.get(bot.getStoragePicturesPath(getChatId(update)), fileName),
+                                bytes);
                         bot.execute(bot.sendDocument(getChatId(update), path.toString()));
 
                         processMessage(update, "Изображение успешно сгенерировано", keyboard);

@@ -54,7 +54,8 @@ public class UserRepository {
                 session.flush();
             } else {
                 logger.warn("Попытка обновить gemini_api_key_id для несуществующего пользователя: {}", chatId);
-                throw new RuntimeException("Попытка обновить gemini_api_key_id для несуществующего пользователя: " + chatId);
+                throw new RuntimeException(
+                        "Попытка обновить gemini_api_key_id для несуществующего пользователя: " + chatId);
             }
             return null;
         });
@@ -70,7 +71,8 @@ public class UserRepository {
                 session.flush();
             } else {
                 logger.warn("Попытка обновить qwen_api_key_id для несуществующего пользователя: {}", chatId);
-                throw new RuntimeException("Попытка обновить qwen_api_key_id для несуществующего пользователя: " + chatId);
+                throw new RuntimeException(
+                        "Попытка обновить qwen_api_key_id для несуществующего пользователя: " + chatId);
             }
             return null;
         });

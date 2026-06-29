@@ -41,7 +41,9 @@ public class StartCommand extends AbstractCommand {
         rows.add(List.of(new KeyboardButton("🎥 Генерация видео", CommandId.MENU_GENERATOR_VIDEO)));
         rows.add(List.of(new KeyboardButton("🖼️ Сгенерированные изображения", CommandId.MENU_GENERATED_PICTURES)));
         rows.add(List.of(new KeyboardButton("🎬 Сгенерированные видео", CommandId.MENU_GENERATED_VIDEOS)));
-        rows.add(List.of(InterfaceFactory.createButton("⚙️ Настройки", CommandId.SETTINGS), InterfaceFactory.createButton("💬 Помощь", CommandId.HELP)));
+        rows.add(List.of(
+                InterfaceFactory.createButton("⚙️ Настройки", CommandId.SETTINGS),
+                InterfaceFactory.createButton("💬 Помощь", CommandId.HELP)));
         keyboard.setKeyboard(rows);
 
         processMessage(update, text, keyboard);

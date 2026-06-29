@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'application'
     id 'jacoco'
+    id 'checkstyle'
 }
 
 repositories {
@@ -15,6 +16,18 @@ java {
 
 application {
     mainClass = 'ru.rapidcoder.gemini.bot.Main'
+}
+
+checkstyle {
+    toolVersion = '10.12.4'
+    ignoreFailures = false
+}
+
+tasks.withType(Checkstyle).configureEach {
+    reports {
+        xml.required = true
+        html.required = false
+    }
 }
 
 def getVersionName = { ->

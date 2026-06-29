@@ -23,7 +23,8 @@ public class HelpCommand extends AbstractCommand {
                 /help - Помощь
 
                 """;
-        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup(List.of(List.of(InterfaceFactory.createButton("🏠 Главное меню", CommandId.BACK_TO_MAIN))));
+        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup(
+                List.of(List.of(InterfaceFactory.createButton("🏠 Главное меню", CommandId.BACK_TO_MAIN))));
 
         processMessage(update, text, keyboard);
     }

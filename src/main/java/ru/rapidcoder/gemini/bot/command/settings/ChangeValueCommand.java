@@ -46,9 +46,13 @@ public abstract class ChangeValueCommand extends AbstractCommand {
                 keyboard.setKeyboard(rows);
                 try {
                     updateValue(update);
-                    processMessage(update, String.format("✅ Новое значение для %s успешно установлено", valueName), keyboard);
+                    processMessage(update,
+                            String.format("✅ Новое значение для %s успешно установлено", valueName),
+                            keyboard);
                 } catch (RuntimeException e) {
-                    processMessage(update, String.format("🚫 Не удалось установить значение для %s", valueName), keyboard);
+                    processMessage(update,
+                            String.format("🚫 Не удалось установить значение для %s", valueName),
+                            keyboard);
                 }
                 return true;
             }

@@ -40,18 +40,34 @@ public class MessageHandler {
         commandRegistry.registry(new HelpCommand(bot, CommandId.HELP, "Помощь"));
 
         commandRegistry.registry(new SettingsCommand(bot, CommandId.SETTINGS, "Настройки"));
-        commandRegistry.registry(new ChangeGeminiApiKeyIdCommand(bot, CommandId.CHANGE_GEMINI_API_KEY_ID, "Установка нового значения для параметра gemini_api_key_id"));
-        commandRegistry.registry(new ChangeQwenApiKeyIdCommand(bot, CommandId.CHANGE_QWEN_API_KEY_ID, "Установка нового значения для параметра qwen_api_key_id"));
+        commandRegistry.registry(new ChangeGeminiApiKeyIdCommand(
+                bot, CommandId.CHANGE_GEMINI_API_KEY_ID,
+                "Установка нового значения для параметра gemini_api_key_id"));
+        commandRegistry.registry(new ChangeQwenApiKeyIdCommand(
+                bot, CommandId.CHANGE_QWEN_API_KEY_ID,
+                "Установка нового значения для параметра qwen_api_key_id"));
 
-        commandRegistry.registry(new ShowGeneratedPicturesCommand(bot, CommandId.MENU_GENERATED_PICTURES, "Отображение списка ранее сгенерированных изображений"));
-        commandRegistry.registry(new GeneratorPictureCommand(bot, CommandId.MENU_GENERATOR_PICTURE, "Генерация изображения"));
-        commandRegistry.registry(new ShowGeneratedPictureCommand(bot, CommandId.SHOW_PICTURE, "Загрузить ранее сгенерированное изображение"));
-        commandRegistry.registry(new DownloadAllPicturesCommand(bot, CommandId.DOWNLOAD_ALL_PICTURES, "Выгрузка всех сохранённых изображений в архив"));
+        commandRegistry.registry(new ShowGeneratedPicturesCommand(
+                bot, CommandId.MENU_GENERATED_PICTURES,
+                "Отображение списка ранее сгенерированных изображений"));
+        commandRegistry.registry(new GeneratorPictureCommand(
+                bot, CommandId.MENU_GENERATOR_PICTURE, "Генерация изображения"));
+        commandRegistry.registry(new ShowGeneratedPictureCommand(
+                bot, CommandId.SHOW_PICTURE, "Загрузить ранее сгенерированное изображение"));
+        commandRegistry.registry(new DownloadAllPicturesCommand(
+                bot, CommandId.DOWNLOAD_ALL_PICTURES,
+                "Выгрузка всех сохранённых изображений в архив"));
 
-        commandRegistry.registry(new ShowGeneratedVideosCommand(bot, CommandId.MENU_GENERATED_VIDEOS, "Отображение списка ранее сгенерированных видео"));
-        commandRegistry.registry(new GeneratorVideoCommand(bot, CommandId.MENU_GENERATOR_VIDEO, "Генерация видео"));
-        commandRegistry.registry(new ShowGeneratedVideoCommand(bot, CommandId.SHOW_VIDEO, "Загрузить ранее сгенерированное видео"));
-        commandRegistry.registry(new DownloadAllVideosCommand(bot, CommandId.DOWNLOAD_ALL_VIDEOS, "Выгрузка всех сохранённых видео в архив"));
+        commandRegistry.registry(new ShowGeneratedVideosCommand(
+                bot, CommandId.MENU_GENERATED_VIDEOS,
+                "Отображение списка ранее сгенерированных видео"));
+        commandRegistry.registry(new GeneratorVideoCommand(
+                bot, CommandId.MENU_GENERATOR_VIDEO, "Генерация видео"));
+        commandRegistry.registry(new ShowGeneratedVideoCommand(
+                bot, CommandId.SHOW_VIDEO, "Загрузить ранее сгенерированное видео"));
+        commandRegistry.registry(new DownloadAllVideosCommand(
+                bot, CommandId.DOWNLOAD_ALL_VIDEOS,
+                "Выгрузка всех сохранённых видео в архив"));
     }
 
     public void handleCommand(Update update) {

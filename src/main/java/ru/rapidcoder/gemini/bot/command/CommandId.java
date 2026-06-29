@@ -2,7 +2,7 @@ package ru.rapidcoder.gemini.bot.command;
 
 public final class CommandId {
 
-    private CommandId() {}
+    private CommandId() { }
 
     public static final String START = "/start";
     public static final String CANCEL = "/cancel";

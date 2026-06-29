@@ -22,7 +22,9 @@ public class GeminiHandler {
     }
 
     public byte[] generatePicture(String prompt) {
-        GenerateContentConfig config = GenerateContentConfig.builder().responseModalities(Collections.singletonList("IMAGE")).build();
+        GenerateContentConfig config = GenerateContentConfig.builder()
+                .responseModalities(Collections.singletonList("IMAGE"))
+                .build();
         GenerateContentResponse response = client.models.generateContent(GEMINI_MODEL, prompt, config);
 
         for (Part part : Objects.requireNonNull(response.parts())) {

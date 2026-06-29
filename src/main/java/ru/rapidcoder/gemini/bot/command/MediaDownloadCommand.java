@@ -66,7 +66,9 @@ public abstract class MediaDownloadCommand extends AbstractCommand {
             try (OutputStream fos = Files.newOutputStream(archivePath);
                  ZipOutputStream zos = new ZipOutputStream(fos)) {
                 for (Path file : files) {
-                    if (file.getFileName().toString().equals(archiveFileName)) continue;
+                    if (file.getFileName().toString().equals(archiveFileName)) {
+                        continue;
+                    }
                     zos.putNextEntry(new ZipEntry(file.getFileName().toString()));
                     Files.copy(file, zos);
                     zos.closeEntry();

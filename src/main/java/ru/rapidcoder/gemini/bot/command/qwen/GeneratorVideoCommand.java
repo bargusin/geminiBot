@@ -34,7 +34,12 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -43,7 +48,8 @@ import java.util.regex.Pattern;
 
 public class GeneratorVideoCommand extends AbstractCommand {
 
-    private static final String IMAGE_URL_REGEX = "(https?://\\S+?\\.(?i)(?:png|jpe?g|gif|webp|bmp|tiff)(?:\\?\\S+)?)(?=[.,;!\\s]|$)";
+    private static final String IMAGE_URL_REGEX =
+            "(https?://\\S+?\\.(?i)(?:png|jpe?g|gif|webp|bmp|tiff)(?:\\?\\S+)?)(?=[.,;!\\s]|$)";
     private static final int MAX_NETWORK_RETRIES = 5;
     protected final UserRepository userRepository;
     protected final EncryptionService encryptionService;
@@ -97,7 +103,8 @@ public class GeneratorVideoCommand extends AbstractCommand {
 
                 Instant startTime = Instant.now();
 
-                CompletableFuture<VideoSynthesisOutput> videoFuture = getVideoSynthesisOutputCompletableFuture(keyboard, startTime, chatId);
+                CompletableFuture<VideoSynthesisOutput> videoFuture =
+                        getVideoSynthesisOutputCompletableFuture(keyboard, startTime, chatId);
 
                 CompletableFuture.runAsync(() -> {
                     int networkErrorsCount = 0;
@@ -112,7 +119,7 @@ public class GeneratorVideoCommand extends AbstractCommand {
                         extraParams.put("prompt_extend", true);
 
                         VideoSynthesisParam param = VideoSynthesisParam.builder()
-                                .model(!StringUtils.isEmpty(imageUrl) ? "wan2.6-i2v-flash" : "wan2.6-t2v") // Модель для Image-to-Video
+                                .model(!StringUtils.isEmpty(imageUrl) ? "wan2.6-i2v-flash" : "wan2.6-t2v")
                                 .prompt(prompt)
                                 //.parameters(extraParams)
                                 .build();
@@ -132,20 +139,28 @@ public class GeneratorVideoCommand extends AbstractCommand {
                                 String status = result.getOutput().getTaskStatus();
                                 networkErrorsCount = 0;
                                 if ("SUCCEEDED".equals(status)) {
-                                    logger.info("Ссылка на сгенерированное видео: {}", result.getOutput().getVideoUrl());
+                                    logger.info("Ссылка на сгенерированное видео: {}",
+                                            result.getOutput().getVideoUrl());
                                     videoFuture.complete(result.getOutput());
                                     break;
                                 } else if ("FAILED".equals(status)) {
                                     logger.error(result.getMessage());
-                                    videoFuture.completeExceptionally(new RuntimeException(result.getMessage() != null ? result.getMessage() : result.getCode()));
+                                    videoFuture.completeExceptionally(new RuntimeException(
+                                            result.getMessage() != null
+                                                    ? result.getMessage() : result.getCode()));
                                     break;
                                 } else {
                                     String timeStr = formatDuration(Duration.between(startTime, Instant.now()));
-                                    bot.updateMessage(chatId, statusMessage.getMessageId(), String.format("⏳ Генерирую видео...%nПрошло времени: %s%nСтатус: %s", timeStr, status), null);
+                                    bot.updateMessage(chatId,
+                                            statusMessage.getMessageId(),
+                                            String.format("⏳ Генерирую видео...%nПрошло времени: %s%nСтатус: %s",
+                                                    timeStr, status),
+                                            null);
                                 }
                             } catch (Exception e) {
                                 networkErrorsCount++;
-                                logger.warn("Сбой сети ({}/{}) при опросе статуса: {}", networkErrorsCount, MAX_NETWORK_RETRIES, e.getMessage());
+                                logger.warn("Сбой сети ({}/{}) при опросе статуса: {}",
+                                        networkErrorsCount, MAX_NETWORK_RETRIES, e.getMessage());
                                 if (networkErrorsCount >= MAX_NETWORK_RETRIES) {
                                     throw new RuntimeException("Сбой сети при опросе");
                                 }
@@ -153,8 +168,10 @@ public class GeneratorVideoCommand extends AbstractCommand {
                         }
                         bot.sendMessage(chatId, "✅ Генерация видео успешно завершена", keyboard);
                     } catch (ApiException e) {
-                        logger.error(String.format("[%s] %s", e.getStatus().getCode(), e.getStatus().getMessage()), e);
-                        videoFuture.completeExceptionally(new RuntimeException(String.format("[%s] %s", e.getStatus().getCode(), e.getStatus().getMessage())));
+                        String errMsg = String.format("[%s] %s",
+                                e.getStatus().getCode(), e.getStatus().getMessage());
+                        logger.error(errMsg, e);
+                        videoFuture.completeExceptionally(new RuntimeException(errMsg));
                     } catch (Exception e) {
                         logger.error(e.getMessage(), e);
                         videoFuture.completeExceptionally(e);
@@ -167,12 +184,15 @@ public class GeneratorVideoCommand extends AbstractCommand {
     }
 
     @NotNull
-    private CompletableFuture<VideoSynthesisOutput> getVideoSynthesisOutputCompletableFuture(InlineKeyboardMarkup keyboard, Instant startTime, Long chatId) {
+    private CompletableFuture<VideoSynthesisOutput> getVideoSynthesisOutputCompletableFuture(
+            InlineKeyboardMarkup keyboard, Instant startTime, Long chatId) {
         CompletableFuture<VideoSynthesisOutput> videoFuture = new CompletableFuture<>();
         videoFuture.whenComplete((output, throwable) -> {
             if (throwable != null) {
                 logger.error("Ошибка в цепочке генерации для chatId: {}", chatId, throwable);
-                bot.sendMessage(chatId, "\uD83D\uDEAB Не удалось сгенерировать видео. " + throwable.getMessage(), keyboard);
+                bot.sendMessage(chatId,
+                        "\uD83D\uDEAB Не удалось сгенерировать видео. " + throwable.getMessage(),
+                        keyboard);
             } else {
                 try {
                     String totalTime = formatDuration(Duration.between(startTime, Instant.now()));
@@ -226,8 +246,9 @@ public class GeneratorVideoCommand extends AbstractCommand {
 
     private String getTelegramFileUrl(Long chatId, List<PhotoSize> photos) {
         PhotoSize largest = photos.stream().max(Comparator.comparing(PhotoSize::getFileSize)).orElse(null);
-        if (largest == null)
+        if (largest == null) {
             return null;
+        }
         try {
             org.telegram.telegrambots.meta.api.objects.File file = bot.execute(new GetFile(largest.getFileId()));
             String fileUrl = "https://api.telegram.org/file/bot" + bot.getBotToken() + "/" + file.getFilePath();
