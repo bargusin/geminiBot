@@ -76,3 +76,8 @@ devDataBaseFile=/path/to/db.sqlite
 - **Google Gemini** (`gemini-2.5-flash-image` model) — synchronous image generation
 - **Alibaba Qwen** (`wan2.6-t2v` model) — asynchronous video generation with polling loop
 - **Telegram Bot API** — long polling, inline keyboards, callback queries
+
+## 📝 Стандарты Git и Коммитов
+* **Префикс задач:** В проекте используется сквозной префикс `PROJ-` для всех задач.
+* **Формат коммитов:** Строго используй формат `[PROJ-цифры] тип(контекст): описание`.
+* **Автоматизация:** Для объединения коммитов всегда используй локальный скилл `git-squash` (находится в `.claude/skills/git-squash/SKILL.md`). Не пытайся выполнять squash альтернативными опасными командами вроде `git rebase -i`.
